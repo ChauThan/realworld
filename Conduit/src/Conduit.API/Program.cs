@@ -48,9 +48,24 @@ services.AddControllers((options) => {
 
 services.AddSwagger();
 
+services.AddCors(opt =>
+{
+    opt.AddPolicy("Development", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 var app = builder.Build();
 
 app.UseRouting();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors("Development");
+}
 
 app.UseAuthorization();
 
