@@ -1,4 +1,5 @@
 import { SERVER_BASE_URL } from '@/lib/constant';
+import ValidationResult from '@/models/validationResult';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
 axios.defaults.baseURL = SERVER_BASE_URL;
@@ -8,10 +9,8 @@ axios.interceptors.response.use(
     (error: AxiosError) => {
       const { data, status, config } = error.response!;
       switch (status) {
-        case 400:
-          console.error(data);
-          break;
-  
+        case 422:
+          return Promise.reject(data)
         case 401:
           console.error('unauthorised');
           break;

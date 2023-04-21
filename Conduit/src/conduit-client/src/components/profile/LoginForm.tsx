@@ -1,28 +1,30 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useLogin } from "@/hooks/useLogin";
 import { useRouter } from "next/router";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, FormEvent, useCallback, useState } from "react";
+import ErrorMessage from "../common/ErrorMessage";
+import ValidationResult from '@/models/validationResult';
 
 export default function LoginForm() {
     const router = useRouter()
-    const [isLoading, setLoading] = React.useState(false);
-    const [errors, setErrors] = React.useState([]);
-    const [email, setEmail] = React.useState("");
-    const [password, setPassword] = React.useState("");
+    const [isLoading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<string[]>();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const { login } = useLogin();
 
     const { setAuth } = useAuth();
 
-    const handleEmailChange = React.useCallback(
+    const handleEmailChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
         [setEmail]
     );
-    const handlePasswordChange = React.useCallback(
+    const handlePasswordChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value),
         [setPassword]
     );
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
 
@@ -32,14 +34,22 @@ export default function LoginForm() {
             router.push("/");
         }
         catch (error) {
-            console.error(error);
+            const valResult = error as ValidationResult;
+            if(!!valResult){
+                const messages : string[] = [];
+                Object.keys(valResult.errors).forEach((key, index) => messages.push(valResult.errors[key]));
+                if(messages.length > 0){
+                    setErrors(messages);
+                }
+            }
+            
         } finally {
             setLoading(false);
         }
     };
-
     return (
         <>
+            <ErrorMessage messages={errors} ></ErrorMessage>
             <form onSubmit={handleSubmit}>
                 <fieldset>
                     <fieldset className="form-group">

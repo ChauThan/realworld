@@ -3,6 +3,7 @@ using Conduit.API.Common.Exceptions;
 using Conduit.API.Infrastructure;
 using Conduit.API.Infrastructure.Auth;
 using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,16 +29,23 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, UserResponse>
         var user = await _dbContext.Users.Where(u => u.Email == request.Payload.User.Email).SingleOrDefaultAsync(cancellationToken);
         if (user == null)
         {
-            throw new UnauthorizedException("Email or password is invalid.");
+            ThrowException("Email or password is invalid.");
         }
 
         var password = await _passwordHasher.HashAsync(request.Payload.User.Password, user.Salt, cancellationToken);
         if (!user.Hash.SequenceEqual(password))
         {
-            throw new UnauthorizedException("Email or password is invalid.");
+            ThrowException("Email or password is invalid.");
         }
 
         return  await _responseBuilder.BuildAsync(user, cancellationToken);
+    }
+
+    public void ThrowException(string message)
+    {
+        var faiture = new ValidationFailure("general", message);
+
+        throw new ValidationException(new List<ValidationFailure>() { faiture });
     }
 }
 
