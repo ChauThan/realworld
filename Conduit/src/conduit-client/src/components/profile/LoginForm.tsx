@@ -1,5 +1,4 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useLogin } from "@/hooks/useLogin";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, FormEvent, useCallback, useState } from "react";
 import ErrorMessage from "../common/ErrorMessage";
@@ -11,9 +10,8 @@ export default function LoginForm() {
     const [errors, setErrors] = useState<string[]>();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const { login } = useLogin();
 
-    const { setAuth } = useAuth();
+    const { login } = useAuth();
 
     const handleEmailChange = useCallback(
         (e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value),
@@ -30,7 +28,6 @@ export default function LoginForm() {
 
         try {
             await login(email, password);
-            setAuth(true);
             router.push("/");
         }
         catch (error) {
