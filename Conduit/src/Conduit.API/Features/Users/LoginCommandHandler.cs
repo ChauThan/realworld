@@ -27,7 +27,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, UserResponse>
     public async Task<UserResponse> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await _dbContext.Users.Where(u => u.Email == request.Payload.User.Email).SingleOrDefaultAsync(cancellationToken);
-        if (user == null)
+        if (user is null)
         {
             ThrowException("Email or password is invalid.");
         }

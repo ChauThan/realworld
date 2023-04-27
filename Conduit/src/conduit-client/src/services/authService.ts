@@ -13,6 +13,6 @@ export class AuthService {
                 password
             }
         };
-        return await http.post<LoginResponse>(`users/login`, payload);
+        return await http.post<LoginResponse>(`users/login`, payload, undefined);
     }
 }
