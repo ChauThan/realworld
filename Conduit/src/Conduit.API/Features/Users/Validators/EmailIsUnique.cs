@@ -10,9 +10,9 @@ public class EmailIsUnique : EntityValidatorBase<User>
     public EmailIsUnique(AppDbContext appDbContext)
     {
         RuleFor(p => p.Email)
-            .MustAsync(async (email, cancellationToken) =>
+            .MustAsync(async (user, email,  cancellationToken) =>
             {
-                var existing = await appDbContext.Users.AsNoTracking().Where(u => u.Email == email).AnyAsync(cancellationToken);
+                var existing = await appDbContext.Users.AsNoTracking().Where(u => u.Email == email && u.Id != user.Id).AnyAsync(cancellationToken);
                 return !existing;
             }).WithMessage("Email is already in use.");
     }

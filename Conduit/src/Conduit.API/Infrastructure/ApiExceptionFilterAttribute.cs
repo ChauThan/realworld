@@ -15,7 +15,8 @@ public class ApiExceptionFilterAttribute : ExceptionFilterAttribute
         {
             { typeof(ValidationException), HandleValidationException },
             { typeof(ResourceNotFoundException), (context) => { context.Result = new NotFoundResult(); } },
-            { typeof(PermissionException), (context) => { context.Result = new ForbidResult(); } }
+            { typeof(PermissionException), (context) => { context.Result = new ForbidResult(); } },
+            { typeof(UnauthorizedException), (context) => {context.Result = new UnauthorizedResult(); } },
         };
     }
 

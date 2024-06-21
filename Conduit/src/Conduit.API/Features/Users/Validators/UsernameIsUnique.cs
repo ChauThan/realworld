@@ -14,9 +14,9 @@ public sealed class UsernameIsUnique : EntityValidatorBase<User>
         _appDbContext = appDbContext;
 
         RuleFor(p => p.Username)
-            .MustAsync(async (username, cancellationToken) =>
+            .MustAsync(async (user, username, cancellationToken) =>
             {
-                var existing = await _appDbContext.Users.AsNoTracking().Where(u => u.Username == username).AnyAsync(cancellationToken);
+                var existing = await _appDbContext.Users.AsNoTracking().Where(u => u.Username == username && u.Id != user.Id).AnyAsync(cancellationToken);
                 return !existing;
             }).WithMessage("User name is already in use.");
     }

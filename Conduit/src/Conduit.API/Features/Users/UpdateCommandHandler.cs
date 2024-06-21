@@ -11,24 +11,24 @@ public class UpdateCommandHandler : IRequestHandler<UpdateCommand, UserResponse>
 {
     private readonly AppDbContext _appDbContext;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly UserResponseBuilder _responseBuilder;
+    private readonly ICurrentUserAccessor _currentUserAccessor;
 
     public UpdateCommandHandler(
         AppDbContext appDbContext,
         IPasswordHasher passwordHasher,
-        IJwtTokenGenerator jwtTokenGenerator,
-        UserResponseBuilder responseBuilder)
+        UserResponseBuilder responseBuilder,
+        ICurrentUserAccessor currentUserAccessor)
     {
         _appDbContext = appDbContext;
         _passwordHasher = passwordHasher;
-        _jwtTokenGenerator = jwtTokenGenerator;
         _responseBuilder = responseBuilder;
+        _currentUserAccessor = currentUserAccessor;
     }
 
     public async Task<UserResponse> Handle(UpdateCommand request, CancellationToken cancellationToken)
     {
-        var user = await _appDbContext.Users.Where(u => u.Id == request.UserId).FirstOrDefaultAsync(cancellationToken);
+        var user = await _appDbContext.Users.Where(u => u.Id == _currentUserAccessor.UserId).FirstOrDefaultAsync(cancellationToken);
         if(user is null)
         {
             throw new ResourceNotFoundException(nameof(User));
